@@ -1,0 +1,65 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/encomendas
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      function:
+        definition: processarEncomenda;confirmarRetirada;confirmarNotificacao
+      bindings:
+        # Canais de saída (produtores)
+        notificarMorador-out-0:
+          destination: encomendas.notificacao
+        confirmarRetirada-out-0:
+          destination: encomendas.retirada
+        confirmarNotificacao-out-0:
+          destination: encomendas.confirmacao
+
+        # Canais de entrada (consumidores)
+        processarEncomenda-in-0:
+          destination: encomendas.notificacao
+          group: processamentoGroup
+        confirmarRetirada-in-0:
+          destination: encomendas.retirada
+          group: retiradaGroup
+        confirmarNotificacao-in-0:
+          destination: encomendas.confirmacao
+          group: confirmacaoGroup
+
+      # Configurações específicas do RabbitMQ
+      rabbit:
+        bindings:
+          processarEncomenda-in-0:
+            consumer:
+              auto-bind-dlq: true
+              dlq-ttl: 5000
+          confirmarRetirada-in-0:
+            consumer:
+              auto-bind-dlq: true
+          confirmarNotificacao-in-0:
+            consumer:
+              auto-bind-dlq: true
+
+server:
+  port: 8080
+
+# Configurações do Swagger/OpenAPI
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
