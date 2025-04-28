@@ -1,6 +1,3 @@
-# Vamos criar o arquivo README.txt com o conteúdo formatado conforme solicitado.
-
-conteudo_readme = """
 📦 Sistema de Gerenciamento de Encomendas para Condomínios
 
 🏢 Plataforma para organização, registro e notificação de entregas em prédios residenciais.
